@@ -1,5 +1,7 @@
+import { redirect } from "next/navigation";
+
 const BlogPage = () => {
-  return <></>;
+  redirect("/blog/all");
 };
 
 export default BlogPage;

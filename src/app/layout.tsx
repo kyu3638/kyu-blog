@@ -31,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${pretendard.variable} ${firaMono.variable} font-pretendard flex min-h-screen flex-col bg-gray-100 text-gray-800`}
+        className={`${pretendard.variable} ${firaMono.variable} font-pretendard flex h-0 min-h-screen flex-col bg-gray-100 text-gray-800`}
       >
         <Header />
         <main className="flex-1">{children}</main>
