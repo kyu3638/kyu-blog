@@ -1,4 +1,5 @@
 import { getPostDetail } from "@/lib/post";
+import dayjs from "dayjs";
 import path from "path";
 import React from "react";
 
@@ -16,9 +17,22 @@ const PostDetailPage = async ({ params }: PostDeatilPageProps) => {
     `${fileName}.mdx`,
   );
 
-  const post = getPostDetail(filePath);
+  const { frontMatter, content, toc } = getPostDetail(filePath);
 
-  return <div>PostDetailPage</div>;
+  return (
+    <div>
+      <div className="mt-4 border-b border-gray-300 p-4">
+        <time className="font-fira-mono inline-block pb-2 font-medium">
+          {dayjs(frontMatter.writtenAt).format("YYYY.MM.DD")}
+        </time>
+        <h1 className="font-fira-mono text-3xl font-bold">
+          {frontMatter.title}
+        </h1>
+      </div>
+      {/* TOC */}
+      {/* <div></div> */}
+    </div>
+  );
 };
 
 export default PostDetailPage;
