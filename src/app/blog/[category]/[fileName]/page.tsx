@@ -1,5 +1,6 @@
 import { getPostDetail } from "@/lib/post";
 import dayjs from "dayjs";
+import { MDXRemote } from "next-mdx-remote/rsc";
 import path from "path";
 import React from "react";
 
@@ -30,7 +31,9 @@ const PostDetailPage = async ({ params }: PostDeatilPageProps) => {
         </h1>
       </div>
       {/* TOC */}
-      {/* <div></div> */}
+      <div>
+        <MDXRemote source={content} />
+      </div>
     </div>
   );
 };
