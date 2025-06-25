@@ -4,7 +4,7 @@ import Link from "next/link";
 
 const Header = () => {
   return (
-    <div className="bg-background z-10 flex h-[56px] w-full items-center border-b border-gray-300 px-4">
+    <div className="z-10 flex h-[56px] w-full shrink-0 items-center border-b border-gray-300 px-4">
       <Link href={"/"}>
         <span className="font-fira-mono text-3xl font-bold">KYU</span>
       </Link>

@@ -6,7 +6,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <div className="flex h-[120px] w-full flex-col items-center justify-center gap-2 border-t border-gray-300">
+    <div className="flex h-[120px] w-full shrink-0 flex-col items-center justify-center gap-2 border-t border-gray-300">
       <Link href="https://github.com/kyu3638" target="_blank">
         <GithubIcon />
       </Link>

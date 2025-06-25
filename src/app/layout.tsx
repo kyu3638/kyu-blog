@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import "@/shared/styles/globals.css";
 import Header from "@/components/layout/Header";
 import { Fira_Mono } from "next/font/google";
 import localFont from "next/font/local";
