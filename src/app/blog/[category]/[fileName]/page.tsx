@@ -1,6 +1,4 @@
 import { getFrontMatter, getMDXPathList, getPostDetail } from "@/lib/post";
-import dayjs from "dayjs";
-import { MDXRemote, MDXRemoteProps } from "next-mdx-remote/rsc";
 import path from "path";
 import PostBody from "@/components/post/PostBody";
 import PostHeader from "@/components/post/PostHeader";
@@ -36,7 +34,7 @@ const PostDetailPage = async ({ params }: PostDeatilPageProps) => {
     `${fileName}.mdx`,
   );
 
-  const { frontMatter, content, toc } = getPostDetail(filePath);
+  const { frontMatter, content /* toc */ } = getPostDetail(filePath);
 
   return (
     <div>

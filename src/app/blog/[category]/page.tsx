@@ -46,7 +46,7 @@ const CategoryPage = async ({ params }: CategoryPageProps) => {
 
   return (
     <section>
-      {frontMatterList.map((frontMatter, index) => {
+      {frontMatterList.map((frontMatter) => {
         return (
           <Link
             key={frontMatter.fileName}
