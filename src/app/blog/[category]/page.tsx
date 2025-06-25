@@ -1,10 +1,37 @@
 import dayjs from "dayjs";
 import Link from "next/link";
 import { getFrontMatter, getMDXPathList } from "@/lib/post";
+import { Metadata } from "next";
 
 type CategoryPageProps = {
   params: Promise<{ category: string }>;
 };
+
+export const metadata: Metadata = {
+  title: "KYU BLOG",
+  description: "학습과 경험을 기록하는 기술 블로그입니다.",
+  openGraph: {
+    title: "KYU BLOG",
+    description: "학습과 경험을 기록하는 기술 블로그입니다.",
+  },
+};
+
+export const generateStaticParams = async () => {
+  const pathList = await getMDXPathList();
+
+  const frontMatterList = pathList.map((path) => {
+    return getFrontMatter(path);
+  });
+
+  return [
+    { category: "all" },
+    ...frontMatterList.map((frontMatter) => {
+      return { category: frontMatter.category };
+    }),
+  ];
+};
+
+export const dynamicParams = false;
 
 const CategoryPage = async ({ params }: CategoryPageProps) => {
   const { category: currentCategory } = await params;

@@ -1,14 +1,30 @@
-import { getPostDetail } from "@/lib/post";
+import { getFrontMatter, getMDXPathList, getPostDetail } from "@/lib/post";
 import dayjs from "dayjs";
 import { MDXRemote, MDXRemoteProps } from "next-mdx-remote/rsc";
 import path from "path";
-import React, { ComponentProps } from "react";
 import "@/shared/styles/markdown.css";
 import rehypePrettyCode from "rehype-pretty-code";
 import fs from "fs";
 
 type PostDeatilPageProps = {
   params: Promise<{ category: string; fileName: string }>;
+};
+
+export const dynamicParams = false;
+
+export const generateStaticParams = async () => {
+  const pathList = await getMDXPathList();
+
+  const frontMatterList = pathList.map((path) => {
+    return getFrontMatter(path);
+  });
+
+  return frontMatterList.map((frontMatter) => {
+    return {
+      category: frontMatter.category,
+      fileName: frontMatter.fileName,
+    };
+  });
 };
 
 const PostDetailPage = async ({ params }: PostDeatilPageProps) => {
