@@ -19,8 +19,14 @@ const pretendard = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "kyu-blog",
-  description: "",
+  title: "KYU BLOG",
+  description: "학습과 경험을 기록하는 기술 블로그입니다.",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon-16x16.png",
+    apple: "/apple-touch-icon.png",
+  },
+  manifest: "/site.webmanifest",
 };
 
 export default function RootLayout({
