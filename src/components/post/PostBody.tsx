@@ -46,7 +46,7 @@ const components: MDXRemoteProps["components"] = {
     return <h3 className="mt-4 text-xl font-semibold">{children}</h3>;
   },
   h4: ({ children }) => {
-    return <h4 className="text-lg font-semibold">{children}</h4>;
+    return <h4 className="mt-4 text-lg font-semibold">{children}</h4>;
   },
   a: ({ href, children }) => {
     return (
