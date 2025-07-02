@@ -62,9 +62,16 @@ const components: MDXRemoteProps["components"] = {
     return <ul className="mt-2 list-disc pl-8">{children}</ul>;
   },
   hr: () => {
-    return <hr className="border-gray-400" />;
+    return <hr className="my-2 border-gray-400" />;
   },
   p: ({ children }) => {
-    return <p className="mt-4">{children}</p>;
+    return <p className="mt-4 break-keep">{children}</p>;
+  },
+  blockquote: ({ children }) => {
+    return (
+      <blockquote className="rounded-md border border-gray-300 p-2 pb-4">
+        {children}
+      </blockquote>
+    );
   },
 };

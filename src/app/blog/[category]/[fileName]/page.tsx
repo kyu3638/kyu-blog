@@ -39,7 +39,7 @@ const PostDetailPage = async ({ params }: PostDeatilPageProps) => {
   return (
     <div>
       <PostHeader writtenAt={frontMatter.writtenAt} title={frontMatter.title} />
-      <article className="font-fira-mono p-4 leading-loose">
+      <article className="font-fira-mono mx-auto max-w-[1000px] px-4 pt-4 pb-30 leading-loose">
         {/* TODO : TOC */}
         <PostBody content={content} />
       </article>
