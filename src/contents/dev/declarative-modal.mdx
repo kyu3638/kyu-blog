@@ -1,0 +1,268 @@
+---
+title: 선언적 모달을 구현하는 과정
+writtenAt: 2025-06-20
+category: dev
+fileName: declarative-modal
+---
+
+# 들어가며
+
+브라우저에서 제공하는 `alert`, `confirm`, `prompt` 등의 API는 다음과 같은 한계점을 갖고 있습니다.
+
+- 스타일링이 불가능합니다. 게다가 브라우저에서 제공하는 디자인이므로 브라우저마다 다른 사용자 경험을 제공할 수도 있습니다.
+- form 등 복잡한 UI를 제공하지 못합니다.
+
+이러한 한계로 프론트엔드 개발자들은 확장된 기능을 필요로 했고, 목적과 기능에 따라 `Modal`,`Dialog`,`Overlay` 등 다양한 명칭으로 브라우저 API의 확장된 버전의 컴포넌트를 개발하여 사용하고 있습니다.
+
+저 또한 프로젝트에서 모달을 직접 구현하여 사용해왔지만, 각 모달별로 state를 선언하여 제어하고 특히 여러 개의 모달을 사용할 경우 코드의 가독성이 낮아지고 중첩된 모달을 구현하는 경우 제어를 위한 setState 함수의 props drilling이 발생하는 경우가 많았습니다.
+
+이번 글에서는 모달을 사용하는 컴포넌트 내에서 state로 모달을 관리하는 방식의 한계점과 개선을 위해 선언적 방식으로 개선한 과정에 대해 작성해보겠습니다.
+
+# Before. state를 통해 관리되는 전통적인 모달
+
+아래는 유저 프로필에서 수정, 삭제, 공유를 위한 3 가지 모달을 제어하기 위해 각 모달별 각각의 state를 사용하는 방식입니다.
+
+```tsx title="각 모달을 별도의 state를 활용하여 제어"
+const UserProfile = () => {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+
+  return (
+    <>
+      {/* components... */}
+      <button onClick={() => setIsEditModalOpen(true)}>수정</button>
+      <button onClick={() => setIsDeleteModalOpen(true)}>삭제</button>
+      <button onClick={() => setIsShareModalOpen(true)}>공유</button>
+
+      {/* components... */}
+      {isEditModalOpen && (
+        <EditModal onClose={() => setIsEditModalOpen(false)} />
+      )}
+      {isDeleteModalOpen && (
+        <DeleteModal onClose={() => setIsDeleteModalOpen(false)} />
+      )}
+      {isShareModalOpen && (
+        <ShareModal onClose={() => setIsShareModalOpen(false)} />
+      )}
+    </>
+  );
+};
+```
+
+모달이 state를 통해 관리되는 환경에서는 다음과 같은 한계점들이 있습니다.
+
+- 컴포넌트의 주된 관심사(예시에서는 User)와 직접 관계가 없는 state 사용으로 주요 코드에 대한 가독성이 떨어집니다.
+- 모달의 상태 선언과 제어, 렌더링 컴포넌트가 분리되어 있어 코드 파악과 관리에 어려움이 있습니다.
+- 모달의 수에 비례하여 상태 선언, 제어, 렌더링 컴포넌트의 수가 증가합니다.
+- 중첩된 모달을 사용하게 될 경우 상위 모달의 상태 제어를 위해 불필요한 props drilling이 발생할 수 있습니다.
+
+# After. 선언적 모달
+
+state로 관리되는 모달 구현 방식을 선언적 방식으로 개선하기 위해 다음과 같은 구현방식을 고안했습니다.
+
+- Context API를 이용하여 애플리케이션의 모든 모달을 하나의 context를 통해 관리
+- state가 아닌 action을 통해 관리하여 직관적인 코드로 모달을 생성/제거
+
+## Preview
+
+예제의 완성된 모습은 아래와 같습니다.\
+state를 이용한 모달을 사용하더라도 같은 기능을 구현할 수는 있겠지만,
+
+- 선언적이고 직관적인 코드를 통한 모달 생성
+- 중첩된 모달을 효과적으로 제어
+
+하는 것에 중점을 두고 코드를 작성해보겠습니다.
+
+![123](/contents/dev/example-preview.gif)
+
+## STEP 1. Context, Provider 생성
+
+```ts
+type TModalContext = {
+  modalList: Modal[];
+  add: (component: ReactNode) => void;
+  close: (id?: string) => void;
+  closeAll: () => void;
+};
+
+const ModalContext = createContext<TModalContext | null>(null);
+
+const ModalProvider = ({children}:{children:ReactNode}) => {
+  const [modalList, setModalList] = useState<Modal[]>([]);
+
+  const root = useCreateRoot("modal-root"); // body의 최하단에 modal-root를 id로 하는 div 추가
+
+  const add = (component: ReactNode) => {
+    const id = createUniqueId();
+    setModalList((prev) => [...prev, { id, component }]);
+  };
+
+  // target modal id가 없는 경우 현재 모달(최상단의 모달)을 닫음
+  const close = (id?: string) => {
+    if (id) setModalList((prev) => prev.filter((modal) => modal.id !== id));
+    else setModalList((prev) => [...prev.slice(0, -1)]);
+  };
+
+  const closeAll = () => {
+    setModalList([]);
+  };
+
+  return (
+    <ModalContext.Provider value={{ modalList, add, close, closeAll }}>
+      {children}
+      {createPortal(
+        modalList.map(({ id, component }) => (
+          <Fragment key={id}>{component}</Fragment>
+        )),
+        root
+      )}
+    </ModalContext.Provider>
+  );
+}
+
+const useModalContext = () => {
+  const context = useContext(ModalContext);
+
+  if (!context) {
+    throw new Error("useModalContext must be used within a ModalProvider");
+  }
+
+  return context;
+};
+```
+
+## STEP 2. 전역 모달 관리를 위한 Provider 설정
+
+```ts title="main.tsx"
+createRoot(document.getElementById("root")!).render(
+  <ModalProvider>
+    <App />
+  </ModalProvider>
+);
+```
+
+## STEP 3. USAGE
+
+현재 활성화된 모달은 context의 modalList 하나의 배열에서 관리되고 있으며, 모달의 생성/제거/전체 제거는 add, close, closeAll 함수를 통해 프로젝트의 어떤 위치에서도 자유롭게 실행할 수 있습니다.
+사용을 위해 회원가입을 시나리오로 하는 간단한 앱을 생성해보겠습니다.
+
+```ts title="SignUpSection.tsx"
+const SignUpSection = () => {
+  const { add } = useModalContext();
+
+  return (
+    <Wrapper>
+      {/* Other components...*/}
+      <Button onClick={() => add(<SignUpModal />)}>회원가입</Button>
+    </Wrapper>
+  );
+};
+```
+
+SignUpSection에서는 회원가입 양식을 제공하는 SignUpModal을 호출합니다.
+기존에 state를 사용할 때 작성해야했던 state, 버튼, 모달 컴포넌트를 버튼에서 선언적으로 사용함으로써 가독성 높은 코드가 되었습니다.
+
+```ts title="SignUpModal.tsx"
+type UserInfo = {
+  userId: string;
+  email: string;
+  password: string;
+  passwordConfirm: string;
+};
+
+const SignUpModal = () => {
+  const { add, close } = useModalContext();
+
+  const [userInfo, setUserInfo] = useState<UserInfo>({
+    userId: "",
+    email: "",
+    password: "",
+    passwordConfirm: "",
+  });
+
+  const onChangeForm = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setUserInfo((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  return (
+    <Modal.Overlay>
+      <Modal.Content>
+        <Modal.Header>
+          <Modal.Title>회원가입</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <SignUpForm userInfo={userInfo} onChangeForm={onChangeForm} /> // 코드 생략
+          <div className="flex gap-5">
+            <Button onClick={() => close()}>취소</Button>
+            <Button onClick={() => add(<ConfirmModal />)}>제출</Button>
+          </div>
+        </Modal.Body>
+      </Modal.Content>
+    </Modal.Overlay>
+  );
+};
+```
+
+사용자가 SignUpForm에 작성한 내용은 제출할 경우 진행 여부를 확인할 ConfirmModal을 띄울 수 있습니다.
+
+```ts title="ConfirmModal.tsx"
+const ConfirmModal = () => {
+  const { add, close } = useModalContext();
+
+  return (
+    <Modal.Overlay>
+      <Modal.Content>
+        <Modal.Header>
+          <Modal.Title>회원 가입</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div>
+            <p>회원 정보를 제출합니다. 진행하시겠습니까?</p>
+          </div>
+          <div className="flex gap-5">
+            <Button onClick={() => close()}>취소</Button>
+            <Button onClick={() => add(<ResultModal />)}>예</Button>
+          </div>
+        </Modal.Body>
+      </Modal.Content>
+    </Modal.Overlay>
+  );
+};
+```
+
+ConfirmModal은 위와 같이 구현되어 있으며, 이 때 ModalContext의 modalList에서는 SignUpModal과 ConfirmModal을 배열의 아이템으로 갖고 있습니다. 여러개의 모달을 하나의 배열에서 관리하므로 모달이 중첩됨에도 불구하고 개발자의 의도에 맞는 순서로 모달이 렌더링 되는 것을 보장할 수 있습니다.
+
+그리고 사용자가 회원가입을 진행하게 되면 결과를 보여주는 ResultModal까지 쉽게 추가할 수 있습니다.\
+※ 요청에 대한 서버의 결과는 toast를 통해서도 보여줄 수 있겠지만, 여기서는 중첩 모달 제어에 중점을 두기 위해 모달로 구현했습니다.
+
+```ts title="ResultModal.tsx"
+const ResultModal = () => {
+  const { closeAll } = useModalContext();
+
+  return (
+    <Modal.Overlay>
+      <Modal.Content>
+        <Modal.Header>
+          <Modal.Title>회원가입 완료</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {/* 성공을 가정 */}
+          <p>축하합니다.</p>
+          <p>회원가입이 완료되었습니다.</p>
+          <div>
+            {/* 모든 모달을 닫음 */}
+            <Button onClick={() => closeAll()}>확인</Button>
+          </div>
+        </Modal.Body>
+      </Modal.Content>
+    </Modal.Overlay>
+  );
+};
+```
+
+가장 하위 모달인 ResultModal에서 useModalContext의 closeAll 함수를 통해 현재 열려있는 모든 모달을 선언적으로 닫을 수 있습니다. 이처럼 하나의 컨텍스트를 통해 모달을 제어함으로써 상위 모달을 제어하기 위한 state를 전달하는 props drilling을 방지할 수 있으며, 모달을 띄우고 제거하는 action을 버튼을 통해 전달함으로써 간결하고 직관적으로 코드를 이해할 수 있습니다.
