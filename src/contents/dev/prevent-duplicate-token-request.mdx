@@ -1,0 +1,175 @@
+---
+title: 토큰 자동 갱신으로 발생하는 중복 요청 문제를 해결하는 과정
+writtenAt: 2025-07-03
+category: dev
+fileName: prevent-duplicate-token-request
+---
+
+# 들어가며
+
+회사 어드민에서 사용자 세션이 10분 동안만 유지되도록 관리 방식을 변경하는 작업이 있었습니다. 변경된 방식에서 의도하지 않게 토큰 갱신 요청이 중복으로 발생하는 문제가 있었고, 이번 글에서는 토큰 갱신 중복 요청을 방지하는 과정에 대해 공유해보겠습니다.
+
+주차관제 서비스인 `BDPark`에서는 건물 관리자 등의 사용자가 한 번 로그인 한 후에는 로그아웃 없이 서비스를 이용하는 것이 중요했습니다. 따라서 사용자가 웹 페이지를 이용하고 있다는 활성화 상태를 판단할 필요가 없었고, 액세스 토큰이 만료되기 1분 전 갱신되도록 처리되어 있습니다. 하지만 IoT 장비에 대한 설정을 담당하는 어드민 페이지의 경우에는 보안을 위해 아래와 같은 전략으로 사용자 인증 방식을 변경했습니다.
+
+- 사용자가 10분 간 어드민을 사용하지 않으면 로그아웃 처리
+- 사용자 활성화 여부는 브라우저에서 서버로 API 요청이 있는지로 판단
+  - 어드민에서는 게시글 작성 등 한 페이지에서 오랜 시간 머물 필요가 없기 때문에 API 요청을 척도로 활성화 여부 평가
+- API 요청이 생성되면 액세스 토큰 갱신
+
+# 예제 프로젝트 개요
+
+회사 코드를 직접 사용할 수가 없어 간단한 예제 프로젝트를 생성했습니다.\
+USER 페이지와 CONTROLLER 페이지를 생성하였고, 각 페이지에 진입할 때 2~3개의 API 요청을 통해 서버로부터 데이터를 가져옵니다.
+토큰 갱신은 axios interceptor를 통해 동작합니다. 이후 글에서는 페이지와 데이터를 조회하는 api 함수는 공통되므로 생략하고 interceptor 코드를 중점으로 살펴보겠습니다.
+
+![asis-tobe](/contents/dev/prevent-duplicate-token-request/asis-tobe.png)
+
+- AS-IS: 페이지가 변경될 경우 해당 페이지를 구성하기 위해 다수의 API 요청이 실행되고, 각 요청마다 토큰 갱신을 실행합니다.
+- TO-BE: 중복된 토큰 갱신 요청이 방지된 버전으로 다수의 API 요청이 동시에 실행되더라도 토큰 갱신은 한번만 수행됩니다.
+
+## AS-IS: 중복된 토큰 요청 발생
+
+중복된 토큰 갱신 요청이 발생하는 상황에서의 axios interceptor의 코드는 아래와 같습니다.
+
+```ts title="src/api/index.ts"
+import axios from "axios";
+
+const apiInstance = axios.create({
+  baseURL: import.meta.env.BASE_URL,
+});
+
+/**
+ * accessToken을 갱신하여 로컬 스토리지에 저장하고 반환하는 함수입니다.
+ * @returns 갱신된 accessToken
+ */
+const renewAccessToken = async (): Promise<string> => {
+  const response = await axios.post("/api/auth/token-renew");
+  const { accessToken } = response.data;
+
+  localStorage.setItem("accessToken", accessToken);
+
+  return accessToken;
+};
+
+apiInstance.interceptors.request.use(async (config) => {
+  const newToken = await renewAccessToken();
+
+  config.headers.Authorization = `Bearer ${newToken}`;
+
+  return config;
+});
+
+export default apiInstance;
+```
+
+현재 코드에서는 서버로 전송되는 모든 요청이 토큰 갱신을 실행한 뒤에 해당 토큰을 헤더에 담아 서버로 전송합니다. 따라서 페이지를 이동하며 데이터를 조회할 때, 데이터 변경 요청을 하는 모든 경우에 발생하는 요청의 수 만큼 토큰 갱신을 요청하게 됩니다.
+
+![토큰 중복 요청 네트워크탭1](/contents/dev/prevent-duplicate-token-request/as-is-duplicate-request-1.png)
+![토큰 중복 요청 네트워크탭2](/contents/dev/prevent-duplicate-token-request/as-is-duplicate-request-2.png)
+
+## TO-BE: 토큰 중복 요청 방지
+
+중복된 토큰 갱신 요청 방지를 위한 axios interceptor의 코드는 아래와 같습니다.
+
+```ts title="src/api/index.ts"
+import axios from "axios";
+
+const apiInstance = axios.create({
+  baseURL: import.meta.env.BASE_URL,
+});
+
+let renewPromise: Promise<string> | null = null;
+
+/**
+ * accessToken을 갱신하여 로컬 스토리지에 저장하고 반환하는 함수입니다.
+ * @returns 갱신된 accessToken
+ */
+const renewAccessToken = async (): Promise<string> => {
+  const response = await axios.post("/api/auth/token-renew");
+  const { accessToken } = response.data;
+
+  localStorage.setItem("accessToken", accessToken);
+
+  return accessToken;
+};
+
+/**
+ * 중복된 토큰 갱신 요청을 방지하기 위한 함수입니다.
+ *
+ * 여러 API 요청이 동시에 발생했을 때, 첫 번째 요청에서만 실제 토큰 갱신을 수행하고
+ * 나머지 요청들은 해당 Promise를 공유하여 같은 토큰을 사용하게 됩니다.
+ *
+ * @returns Promise<string> - 갱신된 accessToken을 반환하는 Promise
+ */
+const preventDuplicateAccessToken = () => {
+  // 이미 진행 중인 토큰 갱신 요청이 있다면 해당 Promise를 반환
+  if (renewPromise !== null) {
+    return renewPromise;
+  }
+
+  // 새로운 토큰 갱신 요청 시작
+  renewPromise = (async () => {
+    try {
+      const token = await renewAccessToken();
+      return token;
+    } finally {
+      // 토큰 갱신 완료 후 Promise 초기화 (성공/실패 관계없이)
+      renewPromise = null;
+    }
+  })();
+
+  return renewPromise;
+};
+
+apiInstance.interceptors.request.use(async (config) => {
+  const newToken = await preventDuplicateAccessToken();
+
+  config.headers.Authorization = `Bearer ${newToken}`;
+
+  return config;
+});
+
+export default apiInstance;
+```
+
+위 코드에서 변경된 내용들은 아래와 같습니다.
+
+- renewPromise: 여러개의 요청들이 공유하는 Promise 입니다.
+  - renewPromise가 null인 경우에는 진행 중인 토큰 갱신 요청이 없으므로 토큰 갱신을 시도합니다.
+  - renewPromise가 Promise 인스턴스인 경우에는 진행 중인 토큰 갱신 요청이 있음을 의미합니다.
+- preventDuplicateAccessToken: 중복된 토큰 갱신 요청을 방지하기 위한 함수입니다.
+  - renewPromise의 상태를 판별하여 이미 진행 중인 토큰 갱신 요청이 있다면 해당 Promise를 반환합니다.
+  - 진행 중인 토큰 갱신 요청이 없다면 토큰 갱신을 진행하고 갱신된 토큰이 담긴 Promise를 반환합니다.
+
+### 수정된 로직은 어떻게 동작하는가?
+
+변경된 코드는 모든 요청이 공유하는 renewPromise를 통해 중복된 토큰 갱신 요청을 방지합니다. renewPromise가 null인 상태에서 첫번째 요청이 토큰 갱신을 진행하게 되면 진행 중인 동안 다른 요청들은 `await preventDuplicateAccessToken();` 라인에서 대기하다가 토큰 갱신이 완료되면 모든 요청이 갱신된 토큰을 사용하여 요청을 진행하게 됩니다.\
+코드의 실행은 아래의 순서대로 진행됩니다.
+
+1. 첫번째 요청 시작(/api/users)
+   - renewPromise == null
+   - 새로운 Promise 생성
+   - 토큰 갱신을 위한 API 호출
+2. 두번째 요청 시작(/api/locations)
+   - renewPromise != null
+   - 토큰 갱신 완료까지 대기
+3. 토큰 갱신 완료
+   - 첫번째 요청과 두번째 요청 모두 갱신된 토큰 획득
+   - renewPromise = null(초기화)
+4. 두 요청 모두 서버로 전송
+   - GET /api/users
+   - GET /api/locations
+
+그 결과 개발자 도구 네트워크탭을 보면 아래와 같이 토큰 갱신이 한 번만 실행됨을 확인할 수 있습니다.
+![토큰 중복 요청 방지 네트워크탭1](/contents/dev/prevent-duplicate-token-request/to-be-duplicate-request-1.png)
+![토큰 중복 요청 방지 네트워크탭2](/contents/dev/prevent-duplicate-token-request/to-be-duplicate-request-2.png)
+
+# 결론
+
+Promise를 활용하여 토큰 중복 요청을 방지한 다음과 같은 개선 효과를 얻을 수 있었습니다.
+
+- 서버 부하 감소와 응답 시간 단축
+  - 사용자에게 페이지를 보여주기 위해 n개의 요청이 수행된다면 n-1개의 불필요한 요청을 줄일 수 있습니다.
+  - 불필요한 요청 감소로 전체적인 응답 시간 또한 감소합니다.
+- 동시성 제어
+  - 중복 요청을 차치하더라도 개발자가 애플리케이션의 동작의 순서와 과정을 더욱 명확하게 제어하게 됨으로써 유지보수에 용이합니다.
