@@ -56,10 +56,10 @@ const components: MDXRemoteProps["components"] = {
     );
   },
   ol: ({ children }) => {
-    return <ol className="mt-2 list-decimal pl-8">{children}</ol>;
+    return <ol className="list-decimal pl-8">{children}</ol>;
   },
   ul: ({ children }) => {
-    return <ul className="mt-2 list-disc pl-8">{children}</ul>;
+    return <ul className="list-disc pl-8">{children}</ul>;
   },
   hr: () => {
     return <hr className="my-2 border-gray-400" />;
@@ -73,5 +73,8 @@ const components: MDXRemoteProps["components"] = {
         {children}
       </blockquote>
     );
+  },
+  img: ({ src, alt, ...rest }) => {
+    return <img src={src} alt={alt} className="pt-4" {...rest} />;
   },
 };
