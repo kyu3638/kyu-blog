@@ -4,6 +4,8 @@ import Header from "@/components/layout/Header";
 import { Fira_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import Footer from "@/components/layout/Footer";
+import { Analytics } from "@vercel/analytics/react";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const firaMono = Fira_Mono({
   weight: ["400", "500", "700"],
@@ -42,6 +44,8 @@ export default function RootLayout({
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
+        <Analytics />
+        <GoogleAnalytics gaId="G-CKGGBY8HYN" />
       </body>
     </html>
   );
