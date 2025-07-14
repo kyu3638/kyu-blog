@@ -16,8 +16,8 @@ const PostBody = ({ content }: PostBodyProps) => {
       options={{
         mdxOptions: {
           rehypePlugins: [
+            rehypeSlug,
             [
-              rehypeSlug,
               rehypePrettyCode,
               {
                 theme: JSON.parse(
