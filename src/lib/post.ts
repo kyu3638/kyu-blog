@@ -1,20 +1,8 @@
 import { glob } from "glob";
 import fs from "fs";
 import matter from "gray-matter";
+import { FrontMatter, TOCItem } from "@/config/types";
 
-type FrontMatter = {
-  title: string;
-  writtenAt: Date;
-  fileName: string;
-  category: string;
-};
-
-/**
- * MDX 파일 경로를 조회하는 함수입니다.
- *
- * @param category (optional) - 지정하지 않으면 모든 카테고리의 MDX 파일을 조회합니다.
- * @returns Promise<string[]> - MDX 파일 경로를 배열로 반환합니다.
- */
 export const getMDXPathList = async (category?: string) => {
   const directory = category ? `${category}/` : "";
   const pattern = `${process.cwd()}/src/contents/${directory}**/*.mdx`;
@@ -22,41 +10,44 @@ export const getMDXPathList = async (category?: string) => {
   return mdxFileList;
 };
 
-/**
- * MDX 파일을 파싱하여 FrontMatter와 content, TOC를 반환합니다.
- * @param filePath - MDX 파일의 경로
- * @returns
- */
-export const parseMDXFile = (filePath: string) => {
-  const fileContent = fs.readFileSync(filePath, "utf-8");
-  const { data, content } = matter(fileContent);
-
-  return {
-    frontMatter: data as FrontMatter,
-    content,
-    toc: "", // not implemented yet
-  };
-};
-
-/**
- * MDX 파일의 FrontMatter를 반환합니다.
- * @param filePath - MDX 파일의 경로
- * @returns
- */
 export const getFrontMatter = (filePath: string) => {
   const { frontMatter } = parseMDXFile(filePath);
 
   return frontMatter;
 };
 
-/**
- * MDX 파일의 모든 정보를 반환합니다.
- * - FrontMatter
- * - content
- * - TOC
- * @param filePath - MDX 파일의 경로
- * @returns
- */
 export const getPostDetail = (filePath: string) => {
   return parseMDXFile(filePath);
+};
+
+export const parseMDXFile = (filePath: string) => {
+  const fileContent = fs.readFileSync(filePath, "utf-8");
+  const { data, content } = matter(fileContent);
+  const toc = parseToc(content);
+
+  return {
+    frontMatter: data as FrontMatter,
+    content,
+    toc: toc,
+  };
+};
+
+export const parseToc = (content: string): TOCItem[] => {
+  const regex = /^(#|##|###) (.*$)/gim;
+  const headingList = content.match(regex);
+
+  return (
+    headingList?.map((heading: string) => ({
+      text: heading.replace("##", "").replace("#", ""),
+      link:
+        "#" +
+        heading
+          .replace(/^#+\s*/, "") // 앞의 모든 # 제거
+          .replace(/[\[\]:!@#$/%^&*()+=,.?]/g, "") // 특수문자 제거 (? 포함)
+          .replace(/\s+/g, "-") // 연속된 공백을 하이픈으로
+          .toLowerCase()
+          .replace(/^-+|-+$/g, ""), // 앞뒤 하이픈 제거
+      indent: (heading.match(/#/g)?.length || 2) - 1,
+    })) || []
+  );
 };
