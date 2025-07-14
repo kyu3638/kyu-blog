@@ -2,6 +2,7 @@ import { getFrontMatter, getMDXPathList, getPostDetail } from "@/lib/post";
 import path from "path";
 import PostBody from "@/components/post/PostBody";
 import PostHeader from "@/components/post/PostHeader";
+import Toc from "@/components/post/Toc";
 
 type PostDeatilPageProps = {
   params: Promise<{ category: string; fileName: string }>;
@@ -34,13 +35,13 @@ const PostDetailPage = async ({ params }: PostDeatilPageProps) => {
     `${fileName}.mdx`,
   );
 
-  const { frontMatter, content /* toc */ } = getPostDetail(filePath);
+  const { frontMatter, content, toc } = getPostDetail(filePath);
 
   return (
     <div>
       <PostHeader writtenAt={frontMatter.writtenAt} title={frontMatter.title} />
+      <Toc toc={toc} />
       <article className="font-fira-mono mx-auto max-w-[1000px] px-4 pt-4 pb-30 leading-loose">
-        {/* TODO : TOC */}
         <PostBody content={content} />
       </article>
     </div>

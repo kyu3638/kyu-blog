@@ -1,9 +1,8 @@
 import React, { ReactNode } from "react";
 import fs from "fs";
 import path from "path";
-import MobileCategoryList from "./components/MobileCategoryList";
-import CategoryItem from "./components/CategoryItem";
-import Divider from "@/components/ui/Divider";
+import MobileCategoryList from "@/components/post/MobileCategoryList";
+import DesktopCategoryList from "@/components/post/DesktopCategoryList";
 
 type CategoryLayoutProps = {
   children: ReactNode;
@@ -23,23 +22,13 @@ const CategoryLayout = async ({ children, params }: CategoryLayoutProps) => {
         categoryList={["all", ...categoryList]}
         currentCategory={currentCategory}
       />
-      {/* PC */}
-      <div className="h-full min-h-0 lg:grid lg:grid-cols-[250px_37px_1fr_37px]">
-        <section className="max-lg:hidden">
-          {["all", ...categoryList].map((category) => {
-            return (
-              <CategoryItem
-                key={category}
-                categoryName={category}
-                currentCategory={currentCategory}
-              />
-            );
-          })}
-        </section>
-        <Divider />
+      {/* Desktop */}
+      <DesktopCategoryList
+        categoryList={categoryList}
+        currentCategory={currentCategory}
+      >
         {children}
-        <Divider />
-      </div>
+      </DesktopCategoryList>
     </>
   );
 };
