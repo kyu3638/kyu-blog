@@ -2,6 +2,7 @@ import { MDXRemote, MDXRemoteProps } from "next-mdx-remote/rsc";
 import fs from "fs";
 import rehypePrettyCode from "rehype-pretty-code";
 import "@/shared/styles/markdown.css";
+import rehypeSlug from "rehype-slug";
 
 type PostBodyProps = {
   content: string;
@@ -16,6 +17,7 @@ const PostBody = ({ content }: PostBodyProps) => {
         mdxOptions: {
           rehypePlugins: [
             [
+              rehypeSlug,
               rehypePrettyCode,
               {
                 theme: JSON.parse(
@@ -36,17 +38,33 @@ const PostBody = ({ content }: PostBodyProps) => {
 export default PostBody;
 
 const components: MDXRemoteProps["components"] = {
-  h1: ({ children }) => {
-    return <h1 className="mt-4 text-3xl font-semibold">{children}</h1>;
+  h1: ({ children, id }) => {
+    return (
+      <h1 id={id} className="mt-4 text-3xl font-semibold">
+        {children}
+      </h1>
+    );
   },
-  h2: ({ children }) => {
-    return <h2 className="mt-4 text-2xl font-semibold">{children}</h2>;
+  h2: ({ children, id }) => {
+    return (
+      <h2 id={id} className="mt-4 text-2xl font-semibold">
+        {children}
+      </h2>
+    );
   },
-  h3: ({ children }) => {
-    return <h3 className="mt-4 text-xl font-semibold">{children}</h3>;
+  h3: ({ children, id }) => {
+    return (
+      <h3 id={id} className="mt-4 text-xl font-semibold">
+        {children}
+      </h3>
+    );
   },
-  h4: ({ children }) => {
-    return <h4 className="mt-4 text-lg font-semibold">{children}</h4>;
+  h4: ({ children, id }) => {
+    return (
+      <h4 id={id} className="mt-4 text-lg font-semibold">
+        {children}
+      </h4>
+    );
   },
   a: ({ href, children }) => {
     return (
