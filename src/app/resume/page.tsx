@@ -1,3 +1,4 @@
+import { Project } from "@/components/resume/project";
 import Link from "next/link";
 import { HTMLAttributes } from "react";
 
@@ -107,7 +108,11 @@ const ResumePage = () => {
         <h2 className="-mx-6 border-b border-gray-200 px-6 pb-2 text-2xl font-bold">
           # Projects
         </h2>
-        <div className="pt-4 text-sm"></div>
+        <Project.Container>
+          {mockProjectList.map((project) => {
+            return <Project.Item {...project} key={project.title} />;
+          })}
+        </Project.Container>
       </Section>
     </div>
   );
@@ -129,3 +134,36 @@ const Section = ({
     </section>
   );
 };
+
+const mockProjectList = [
+  {
+    title: "BDPark",
+    description:
+      "주차관제 서비스 주차관제 서비스 주차관제 서비스 주차관제 서비스주차관제 서비스",
+    skillList: ["React", "Typescript", "webpack", "vite"],
+  },
+  {
+    title: "BDPark2",
+    description: "주차관제 서비스2",
+    skillList: ["React", "Typescript", "webpack", "vite"],
+  },
+  {
+    title: "BDPark3",
+    description: "주차관제 서비스3",
+    skillList: ["React", "Typescript", "webpack", "vite"],
+  },
+  {
+    title: "BDPark4",
+    description: "주차관제 서비스4",
+    skillList: [
+      "React",
+      "Typescript",
+      "webpack",
+      "vite",
+      "React1",
+      "Typescript1",
+      "webpack1",
+      "vite1",
+    ],
+  },
+];
