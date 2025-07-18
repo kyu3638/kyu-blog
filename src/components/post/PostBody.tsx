@@ -74,20 +74,28 @@ const components: MDXRemoteProps["components"] = {
     );
   },
   ol: ({ children }) => {
-    return <ol className="list-decimal pl-8">{children}</ol>;
+    return (
+      <ol className="flex list-decimal flex-col gap-y-2 pl-8 leading-loose">
+        {children}
+      </ol>
+    );
   },
   ul: ({ children }) => {
-    return <ul className="list-disc pl-8">{children}</ul>;
+    return (
+      <ul className="flex list-disc flex-col gap-y-2 pl-8 leading-loose">
+        {children}
+      </ul>
+    );
   },
   hr: () => {
     return <hr className="my-2 border-gray-400" />;
   },
   p: ({ children }) => {
-    return <p className="mt-4 break-keep">{children}</p>;
+    return <p className="my-2 leading-loose break-keep">{children}</p>;
   },
   blockquote: ({ children }) => {
     return (
-      <blockquote className="rounded-md border border-gray-300 p-2 pb-4">
+      <blockquote className="my-3 rounded-md border border-gray-300 bg-blue-100 p-2">
         {children}
       </blockquote>
     );

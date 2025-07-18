@@ -61,7 +61,7 @@ const Overlay = ({ children }: { children: ReactNode }) => {
 const Content = ({ children }: { children: ReactNode }) => {
   const modal = useModalContext();
   return (
-    <div className="max-h-[70dvh] w-full max-w-[768px] border border-gray-400 bg-white">
+    <div className="max-h-[90dvh] w-full max-w-[768px] border border-gray-400 bg-white">
       {children}
     </div>
   );
@@ -71,7 +71,7 @@ const Header = ({ children }: { children: ReactNode }) => {
   const modal = useModalContext();
 
   return (
-    <div className="relative p-4">
+    <div className="relative p-4 lg:p-6">
       {children}
       <div className="absolute top-4 right-4" onClick={modal.remove}>
         <CloseIcon />
@@ -81,19 +81,17 @@ const Header = ({ children }: { children: ReactNode }) => {
 };
 
 const Body = ({ children }: { children: ReactNode }) => {
-  return <div className="px-4 pb-4">{children}</div>;
+  return (
+    <div className="max-h-[80dvh] overflow-y-scroll px-4 pb-4 lg:px-6 lg:pb-6">
+      {children}
+    </div>
+  );
 };
 
-const Footer = ({ children }: { children: ReactNode }) => {
-  return <div className="px-4 pb-4">{children}</div>;
+const Footer = ({ children }: { children?: ReactNode }) => {
+  return (
+    <div className="px-4 pb-4 lg:px-6 lg:pb-6">{children && children}</div>
+  );
 };
 
-// export {
-//   ModalTrigger,
-//   ModalOverlay,
-//   ModalContent,
-//   ModalHeader,
-//   ModalBody,
-//   ModalFooter,
-// };
 export { Trigger, Overlay, Content, Header, Body, Footer };
