@@ -20,8 +20,10 @@ const Trigger = <T extends React.ReactElement>({
   return cloneElement(children, {
     onClick: (e: React.MouseEvent) => {
       // 기존 onClick 호출 (있다면)
-      // @ts-ignore
-      const originalOnClick = (children.props as any).onClick;
+      // @ts-expect-error expected error
+      const originalOnClick = children.props.onClick as
+        | ((e: React.MouseEvent) => void)
+        | undefined;
       if (originalOnClick) {
         originalOnClick(e);
       }
@@ -29,8 +31,8 @@ const Trigger = <T extends React.ReactElement>({
       modal.add(render);
     },
     style: {
-      // @ts-ignore
-      ...(children.props as any).style,
+      // @ts-expect-error expected error
+      ...(children.props.style as React.CSSProperties),
       cursor: "pointer",
     },
   } as Partial<T["props"]>);
