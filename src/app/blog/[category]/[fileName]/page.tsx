@@ -30,7 +30,7 @@ const PostDetailPage = async ({ params }: PostDeatilPageProps) => {
 
   const filePath = path.join(
     process.cwd(),
-    "src/contents",
+    "src/contents/posts",
     category,
     `${fileName}.mdx`,
   );

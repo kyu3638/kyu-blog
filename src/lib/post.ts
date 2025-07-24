@@ -5,7 +5,7 @@ import { FrontMatter, TOCItem } from "@/config/types";
 
 export const getMDXPathList = async (category?: string) => {
   const directory = category ? `${category}/` : "";
-  const pattern = `${process.cwd()}/src/contents/${directory}**/*.mdx`;
+  const pattern = `${process.cwd()}/src/contents/posts/${directory}**/*.mdx`;
   const mdxFileList = await glob(pattern);
   return mdxFileList;
 };

@@ -6,6 +6,7 @@ import localFont from "next/font/local";
 import Footer from "@/components/layout/Footer";
 import { Analytics } from "@vercel/analytics/react";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { ModalProvider } from "@/components/ui/Modal";
 
 const firaMono = Fira_Mono({
   weight: ["400", "500", "700"],
@@ -41,11 +42,13 @@ export default function RootLayout({
       <body
         className={`${pretendard.variable} ${firaMono.variable} font-pretendard flex h-0 min-h-screen flex-col bg-gray-100 text-gray-800`}
       >
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <Analytics />
-        <GoogleAnalytics gaId="G-CKGGBY8HYN" />
+        <ModalProvider>
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <Analytics />
+          <GoogleAnalytics gaId="G-CKGGBY8HYN" />
+        </ModalProvider>
       </body>
     </html>
   );

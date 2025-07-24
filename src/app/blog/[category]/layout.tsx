@@ -12,7 +12,7 @@ type CategoryLayoutProps = {
 const CategoryLayout = async ({ children, params }: CategoryLayoutProps) => {
   const { category: currentCategory } = await params;
 
-  const directory = path.join(process.cwd(), "src", "contents");
+  const directory = path.join(process.cwd(), "src", "contents", "posts");
   const categoryList = fs.readdirSync(directory);
 
   return (

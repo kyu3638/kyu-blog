@@ -1,0 +1,33 @@
+---
+title: 코드숲
+writtenAt: 2024-02-01
+category: project
+fileName: code-forest
+description: 개발자들이 토론과 아이디어를 나눌 수 있는 커뮤니티
+skillList: ["React", "Typescript", "react-query", "firebase"]
+start: 2024.02
+end: 2024.02
+link: https://github.com/kyu3638/community
+---
+
+### 개요
+
+- 개발자들이 토론과 아이디어를 나눌 수 있는 커뮤니티
+- Firebase를 이용한 서버리스 아키텍처
+
+### 주요기능
+
+- 게시글 및 댓글 CRUD
+- 회원간 팔로우, 게시글 좋아요
+
+### 구현사항
+
+- Protected Route 활용으로 권한별 페이지 접근 인가 관리
+- 리액트 쿼리를 활용한 Optimistic Update로 사용자에게 즉각적인 반응 제공
+
+### 최적화
+
+- vite-bundle-analyzer, 네트워크 탭, Lighthouse를 활용하여 LCP 및 빌드 소요시간 등 측정과 분석
+- 코드 스플리팅을 통해 빌드 소요시간, FCP, LCP 등 평균 30% 이상 감소
+- 사용자가 등록한 이미지를 용도에 맞게 3가지 사이즈로 Resize 후 저장하여 사용함으로써 이미지 로드 시간 감소로 사용성 향상
+- React-Helmet을 통해 페이지별 meta tag 동적 설정하여 SEO개선

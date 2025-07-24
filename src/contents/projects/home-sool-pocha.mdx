@@ -1,0 +1,45 @@
+---
+title: 홈술포차
+writtenAt: 2023-08-01
+category: project
+fileName: home-sool-pocha
+description: 간편하게 비대면 술자리와 미니게임을 즐길 수 있는 서비스
+skillList: ["React", "OpenVidu", "MediaPipe", "WebRTC"]
+start: 2023.07
+end: 2023.08
+link: https://github.com/kyu3638/hompocha
+---
+
+### 개요
+
+- 간편하게 비대면 술자리와 미니게임을 즐길 수 있는 서비스
+
+### 주요기능
+
+- 다자간 영상통화로 비대면 술자리 기능 제공
+- 대화 보조 기능 및 미니게임
+- 음성 및 동작 인식을 통해 마우스, 키보드 사용을 최소화한 편리한 인터페이스
+
+### 아키텍처
+
+![홈술포차 아키텍처](/contents/projects/home-sool-pocha/architecture.png)
+
+### 역할
+
+- 음성인식 관련 기능
+  - 음성인식을 통한 대화방 특수 이펙트 구현
+  - 발음이 어려운 문장을 정확하게 말해야하는 발음 게임
+- 동작인식 관련 기능
+  - 정해진 시간 동안 주문받은 주류를 전달하는 소맥 게임
+  - 하늘에서 떨어지는 술병을 피하는 피하기 게임
+
+### 트러블 슈팅
+
+- 개별 클라이언트의 성능 차이와 네트워크 상황에 따라 게임 시작 타이밍이 일치하지 않는 문제
+  - 서버를 중심으로 시작과 종료 신호를 전달하는 방식으로 모든 사용자가 준비되었을 때 게임이 시작되도록 수정
+
+![홈술포차 이미지1](/contents/projects/home-sool-pocha/image1.gif)
+![홈술포차 이미지2](/contents/projects/home-sool-pocha/image2.gif)
+![홈술포차 이미지3](/contents/projects/home-sool-pocha/image3.gif)
+![홈술포차 이미지4](/contents/projects/home-sool-pocha/image4.gif)
+![홈술포차 이미지5](/contents/projects/home-sool-pocha/image5.gif)

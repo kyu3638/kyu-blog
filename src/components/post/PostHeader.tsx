@@ -8,7 +8,7 @@ type PostHeaderProps = {
 const PostHeader = ({ writtenAt, title }: PostHeaderProps) => {
   return (
     <div className="border-b border-gray-300 p-4">
-      <div className="mx-auto max-w-[1000px] px-4">
+      <div className="mx-auto max-w-[1000px]">
         <time className="font-fira-mono inline-block pb-2 font-medium">
           {dayjs(writtenAt).format("YYYY.MM.DD")}
         </time>
