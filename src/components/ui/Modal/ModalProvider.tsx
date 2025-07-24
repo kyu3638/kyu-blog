@@ -1,7 +1,7 @@
 "use client";
 
 import useCreateRoot from "@/shared/hooks/useCreateRoot";
-import { createContext, Fragment, ReactNode, useState } from "react";
+import { createContext, Fragment, ReactNode, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
 type ModalType = {
@@ -25,7 +25,6 @@ const ModalProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const remove = () => {
-    console.log("asdf");
     setModalList((prev) => {
       const removed = prev.slice(0, -1);
       return removed;
@@ -35,6 +34,30 @@ const ModalProvider = ({ children }: { children: ReactNode }) => {
   const removeAll = () => {
     setModalList([]);
   };
+
+  useEffect(() => {
+    const removeByEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") remove();
+    };
+
+    const handlePopState = () => {
+      if (modalList.length > 0) {
+        remove();
+      }
+    };
+
+    if (modalList.length > 0) {
+      window.history.pushState(null, "", window.location.href);
+    }
+
+    window.addEventListener("keydown", removeByEsc);
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("keydown", removeByEsc);
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [modalList.length]);
 
   return (
     <ModalContext.Provider value={{ isOpen, add, remove, removeAll }}>

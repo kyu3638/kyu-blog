@@ -61,7 +61,7 @@ const Overlay = ({ children }: { children: ReactNode }) => {
 const Content = ({ children }: { children: ReactNode }) => {
   const modal = useModalContext();
   return (
-    <div className="max-h-[90dvh] w-full max-w-[768px] border border-gray-400 bg-white">
+    <div className="flex max-h-[90dvh] min-h-0 w-full flex-col border border-gray-400 bg-white lg:max-w-[600px]">
       {children}
     </div>
   );
@@ -82,7 +82,7 @@ const Header = ({ children }: { children: ReactNode }) => {
 
 const Body = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="max-h-[80dvh] overflow-y-scroll px-4 pb-4 lg:px-6 lg:pb-6">
+    <div className="max-h-[80dvh] flex-1 overflow-y-auto px-4 pb-4 lg:px-6 lg:pb-6">
       {children}
     </div>
   );
