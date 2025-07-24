@@ -1,4 +1,3 @@
-import PostBody from "@/components/post/PostBody";
 import { ProjectList } from "@/components/resume/project";
 import Link from "next/link";
 import { HTMLAttributes } from "react";

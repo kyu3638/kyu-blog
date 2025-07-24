@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 const useCreateRoot = (rootId: string) => {
   const [root, setRoot] = useState<HTMLElement | null>(null);
