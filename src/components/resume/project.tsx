@@ -59,13 +59,19 @@ const ProjectModal = ({ projectMatter, content }: ProjectType) => {
     <Modal.Overlay>
       <Modal.Content>
         <Modal.Header>
-          {/* 추가정보 정리 필요 */}
-          <h2 className="text-center text-2xl font-bold">
-            {projectMatter.title}
-          </h2>
+          <div className="flex flex-col justify-center gap-y-2">
+            <h2 className="text-center text-2xl font-bold">
+              {projectMatter.title}
+            </h2>
+            <span className="text-center text-sm text-gray-500">
+              {projectMatter.start} - {projectMatter.end}
+            </span>
+          </div>
         </Modal.Header>
         <Modal.Body>
-          <PostBody content={content} />
+          <div className="text-sm">
+            <PostBody content={content} />
+          </div>
         </Modal.Body>
         <Modal.Footer></Modal.Footer>
       </Modal.Content>

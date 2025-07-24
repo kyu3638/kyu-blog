@@ -1,4 +1,4 @@
-import { ProjectMatter } from "@/config/types/resume";
+import { ProjectMatter, ProjectType } from "@/config/types/resume";
 import fs from "fs";
 import { glob } from "glob";
 import matter from "gray-matter";
@@ -16,12 +16,13 @@ export const parseProject = (filePath: string) => {
   return { projectMatter: data as ProjectMatter, content };
 };
 
-export const getProjectList = async () => {
+export const getProjectList = async (): Promise<ProjectType[]> => {
   const projectPathList = await getProjectPathList();
 
-  const projectList = projectPathList.map((path) => {
-    return parseProject(path);
-  });
+  const projectList = projectPathList.map((path) => parseProject(path));
 
-  return projectList;
+  return projectList.sort(
+    (a, b) =>
+      b.projectMatter.writtenAt.getTime() - a.projectMatter.writtenAt.getTime(),
+  );
 };

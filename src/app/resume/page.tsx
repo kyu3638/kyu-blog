@@ -10,10 +10,10 @@ const ResumePage = async () => {
         <h1 className="-mx-6 border-b border-gray-200 px-6 pb-2 text-3xl font-bold">
           전승규
         </h1>
-        <div className="font-fira-mono pt-4">
+        <div className="font-fira-mono flex flex-col gap-y-2 pt-4">
           <p>EMAIL: kyu3638@gmail.com</p>
           <p>
-            GITHUB:{" "}
+            GITHUB:&nbsp;
             <Link
               className="hover:underline"
               href="https://github.com/kyu3638"
@@ -28,9 +28,13 @@ const ResumePage = async () => {
         <h2 className="-mx-6 border-b border-gray-200 px-6 pb-2 text-2xl font-bold">
           # About Me
         </h2>
-        <div className="pt-4">
-          <p>삶의 변화를 제공하는 서비스를 만드는 것을 좋아합니다.</p>
-          <p>상호작용을 통해 그 과정을 빠르고 단단하게 하고자 노력합니다.</p>
+        <div className="flex flex-col gap-y-2 pt-4">
+          <p>사용자 삶의 변화를 제공하는 서비스를 만드는 것을 좋아합니다.</p>
+          <p>협업을 통해 그 과정을 빠르고 단단하게 하고자 노력합니다.</p>
+          <p>
+            기능 구현에 그치지 않고 아이디어 제안과 소통을 통해 발전시키는
+            과정에 적극 참여합니다.
+          </p>
         </div>
       </Section>
       <Section>
@@ -70,7 +74,7 @@ const ResumePage = async () => {
           <p className="font-fira-mono text-gray-500">2017.12 ~ 2023.03</p>
           <p className="pt-2 text-base font-bold">기업지원사업 기획/운영</p>
           <ul className="flex list-inside list-disc flex-col gap-y-1.5">
-            <li>김포시 해외시장 개척단</li>
+            <li>김포시 해외시장 개척단 기획 및 운영</li>
             <li>김포시건설관련기업인협의회 운영</li>
           </ul>
         </div>
@@ -82,11 +86,18 @@ const ResumePage = async () => {
         <div className="-mx-6 border-b border-gray-200 px-6 pt-4 pb-2 text-sm">
           <h3 className="text-lg font-bold">크래프톤 정글</h3>
           <p className="font-fira-mono text-gray-500">2023.04 ~ 2023.08</p>
+          <ul className="flex list-inside list-disc flex-col gap-y-1.5">
+            <li>자료구조 및 알고리즘</li>
+            <li>네트워크, CS 학습</li>
+            <li>최종 프로젝트: 홈술포차 - 비대면 술자리 서비스</li>
+          </ul>
         </div>
         <div className="pt-4 text-sm">
           <h3 className="text-lg font-bold">중앙대학교</h3>
           <p className="font-fira-mono text-gray-500">2009.03 ~ 2018.02</p>
-          <p>경제학 학사</p>
+          <ul className="flex list-inside list-disc flex-col gap-y-1.5">
+            <li>경제학 학사</li>
+          </ul>
         </div>
       </Section>
       {/* Skill을 넣을까? */}

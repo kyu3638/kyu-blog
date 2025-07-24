@@ -75,14 +75,14 @@ const components: MDXRemoteProps["components"] = {
   },
   ol: ({ children }) => {
     return (
-      <ol className="flex list-decimal flex-col gap-y-2 pl-8 leading-loose">
+      <ol className="flex list-decimal flex-col gap-y-1 pl-8 leading-loose">
         {children}
       </ol>
     );
   },
   ul: ({ children }) => {
     return (
-      <ul className="flex list-disc flex-col gap-y-2 pl-8 leading-loose">
+      <ul className="flex list-disc flex-col gap-y-1 pl-8 leading-loose">
         {children}
       </ul>
     );
@@ -101,6 +101,13 @@ const components: MDXRemoteProps["components"] = {
     );
   },
   img: ({ src, alt, ...rest }) => {
-    return <img src={src} alt={alt} className="pt-4" {...rest} />;
+    return (
+      <img
+        src={src}
+        alt={alt}
+        className="my-2 overflow-hidden rounded-lg border border-gray-300 pt-4"
+        {...rest}
+      />
+    );
   },
 };
