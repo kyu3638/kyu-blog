@@ -14,7 +14,7 @@ const Header = () => {
       <Link href={"/"}>
         <span className="font-fira-mono text-3xl font-bold">KYU</span>
       </Link>
-      <div className="font-fira-mono flex grow items-center gap-4 p-16 text-xl">
+      <div className="font-fira-mono flex grow items-center gap-4 pl-6 text-xl lg:pl-16">
         <Link
           href="/blog/all"
           className={`${cn(pathname.startsWith("/blog") ? "text-gray-800" : "text-gray-500")} font-medium`}
