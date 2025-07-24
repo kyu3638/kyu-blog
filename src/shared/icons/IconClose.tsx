@@ -15,6 +15,7 @@ const CloseIcon = ({ size = 24, title, ...props }: IconProps) => {
         strokeLinecap="round"
         strokeLinejoin="round"
         className="lucide lucide-x-icon lucide-x"
+        {...props}
       >
         <title>{title ?? ""}</title>
         <path d="M18 6 6 18" />

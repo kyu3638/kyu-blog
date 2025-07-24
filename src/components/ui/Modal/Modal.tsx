@@ -20,6 +20,7 @@ const Trigger = <T extends React.ReactElement>({
   return cloneElement(children, {
     onClick: (e: React.MouseEvent) => {
       // 기존 onClick 호출 (있다면)
+      // @ts-ignore
       const originalOnClick = (children.props as any).onClick;
       if (originalOnClick) {
         originalOnClick(e);
@@ -28,6 +29,7 @@ const Trigger = <T extends React.ReactElement>({
       modal.add(render);
     },
     style: {
+      // @ts-ignore
       ...(children.props as any).style,
       cursor: "pointer",
     },
@@ -59,7 +61,6 @@ const Overlay = ({ children }: { children: ReactNode }) => {
 };
 
 const Content = ({ children }: { children: ReactNode }) => {
-  const modal = useModalContext();
   return (
     <div className="flex max-h-[90dvh] min-h-0 w-full flex-col border border-gray-400 bg-white lg:max-w-[600px]">
       {children}
